@@ -238,16 +238,20 @@ static void deleteDescriptor(LADSPA_Descriptor* descPekiAmp) {
 	unsigned long lIndex;
 
 	if (descPekiAmp) {
+
 		free((char*)descPekiAmp->Label);
 		free((char*)descPekiAmp->Name);
 		free((char*)descPekiAmp->Maker);
 		free((char*)descPekiAmp->Copyright);
 		free((LADSPA_PortDescriptor*)descPekiAmp->PortDescriptors);
+
 		for (lIndex = 0; lIndex < descPekiAmp->PortCount; lIndex++)
 			free((char*)(descPekiAmp->PortNames[lIndex]));
+
 		free((char**)descPekiAmp->PortNames);
 		free((LADSPA_PortRangeHint*)descPekiAmp->PortRangeHints);
 		free(descPekiAmp);
+
 	}
 
 }
