@@ -6,7 +6,7 @@ Features
 **"Peki's dB Amplifier (Mono)"** *[2001]* and
 **"Peki's dB Amplifier (Stereo)"** *[2002]*.
 
-# tanh_softclip.c
+# softclip.c
 
 A `y = tanh(param * x)` soft clipper, taken from the "Harmonic Instability of Digital Soft Clipping
 Algorithms" paper by Sean Enderby and Zlatko Baracskai
@@ -22,5 +22,5 @@ I've made an interactive curve that explains this plugin.
 It can be seen [here](https://www.desmos.com/calculator/s6djw5g35s).
 
 Features
-**"Peki's Tanh Soft Clipper (Mono)"** *[2003]* and
-**"Peki's Tanh Soft Clipper (Stereo)"** *[2004]*.
+**"Peki's Soft Clipper (Mono)"** *[2003]* and
+**"Peki's Soft Clipper (Stereo)"** *[2004]*.
