@@ -13,10 +13,10 @@ Algorithms" paper by Sean Enderby and Zlatko Baracskai
 [(link)](https://dafx12.york.ac.uk/papers/dafx12_submission_45.pdf).
 
 The clipper features an adjustable dB threshold and parameter.
-The dB threshold works by amplifying the signal by the given value, applying the threshold,
-and then lowering the output by the same threshold volume.
+The dB threshold works by amplifying the signal by the given value, applying the clipping,
+and then lowering the output by the same threshold value.
 
-The adjustable parameter is the one seen in the mathematical formula.
+The adjustable parameter is the one seen in the mathematical formula given at the start.
 
 I've made an interactive curve that explains this plugin.
 It can be seen [here](https://www.desmos.com/calculator/s6djw5g35s).
