@@ -26,43 +26,44 @@
 typedef struct {
 
 	LADSPA_Data* pControl;
+
 	LADSPA_Data* pInput1;
 	LADSPA_Data* pOutput1;
 	LADSPA_Data* pInput2;  /* Stereo */
 	LADSPA_Data* pOutput2; /* Stereo */
 
-} AmplifierDB;
+} PekiAmpDB;
 
-static LADSPA_Handle instantiateAmplifierDB(
+static LADSPA_Handle instantiatePekiAmpDB(
 	const LADSPA_Descriptor* Descriptor,
 	unsigned long SampleRate
 ) {
-	return malloc(sizeof(AmplifierDB));
+	return malloc(sizeof(PekiAmpDB));
 }
 
-static void connectPortToAmplifierDB(
+static void connectPortToPekiAmpDB(
 	LADSPA_Handle Instance,
 	unsigned long Port,
 	LADSPA_Data* DataLocation
 ) {
 
-	AmplifierDB* sAmplifierDB;
+	PekiAmpDB* sPekiAmpDB;
 
-	sAmplifierDB = (AmplifierDB*)Instance;
+	sPekiAmpDB = (PekiAmpDB*)Instance;
 
 	switch (Port) {
 
-		case AMP_CONTROL: sAmplifierDB->pControl = DataLocation; break;
-		case AMP_INPUT1:  sAmplifierDB->pInput1  = DataLocation; break;
-		case AMP_OUTPUT1: sAmplifierDB->pOutput1 = DataLocation; break;
-		case AMP_INPUT2:  sAmplifierDB->pInput2  = DataLocation; break; /* Stereo */
-		case AMP_OUTPUT2: sAmplifierDB->pOutput2 = DataLocation; break; /* Stereo */
+		case AMP_CONTROL: sPekiAmpDB->pControl = DataLocation; break;
+		case AMP_INPUT1:  sPekiAmpDB->pInput1  = DataLocation; break;
+		case AMP_OUTPUT1: sPekiAmpDB->pOutput1 = DataLocation; break;
+		case AMP_INPUT2:  sPekiAmpDB->pInput2  = DataLocation; break; /* Stereo */
+		case AMP_OUTPUT2: sPekiAmpDB->pOutput2 = DataLocation; break; /* Stereo */
 
 	}
 
 }
 
-static void runMonoAmplifierDB(
+static void runMonoPekiAmpDB(
 	LADSPA_Handle Instance,
 	 unsigned long SampleCount
 ) {
@@ -70,21 +71,21 @@ static void runMonoAmplifierDB(
 	LADSPA_Data* dInput;
 	LADSPA_Data* dOutput;
 	LADSPA_Data dGain;
-	AmplifierDB* sAmplifierDB;
+	PekiAmpDB* sPekiAmpDB;
 	unsigned long sampleIndex;
 
-	sAmplifierDB = (AmplifierDB*)Instance;
+	sPekiAmpDB = (PekiAmpDB*)Instance;
 
-	dInput = sAmplifierDB->pInput1;
-	dOutput = sAmplifierDB->pOutput1;
-	dGain = *(sAmplifierDB->pControl);
+	dInput = sPekiAmpDB->pInput1;
+	dOutput = sPekiAmpDB->pOutput1;
+	dGain = *(sPekiAmpDB->pControl);
 
 	for (sampleIndex = 0; sampleIndex < SampleCount; ++sampleIndex)
 		dOutput[sampleIndex] = dInput[sampleIndex] * pow10f(dGain / 20.0);
 
 }
 
-static void runStereoAmplifierDB(
+static void runStereoPekiAmpDB(
 	LADSPA_Handle Instance,
 	unsigned long SampleCount
 ) {
@@ -92,165 +93,165 @@ static void runStereoAmplifierDB(
 	LADSPA_Data* dInput;
 	LADSPA_Data* dOutput;
 	LADSPA_Data dGain;
-	AmplifierDB* sAmplifierDB;
+	PekiAmpDB* sPekiAmpDB;
 	unsigned long sampleIndex;
 
-	sAmplifierDB = (AmplifierDB*)Instance;
+	sPekiAmpDB = (PekiAmpDB*)Instance;
 
-	dGain = *(sAmplifierDB->pControl);
+	dGain = *(sPekiAmpDB->pControl);
 
-	dInput = sAmplifierDB->pInput1;
-	dOutput = sAmplifierDB->pOutput1;
+	dInput = sPekiAmpDB->pInput1;
+	dOutput = sPekiAmpDB->pOutput1;
 	for (sampleIndex = 0; sampleIndex < SampleCount; ++sampleIndex)
 		dOutput[sampleIndex] = dInput[sampleIndex] * pow10f(dGain / 20.0);
 
-	dInput = sAmplifierDB->pInput2;
-	dOutput = sAmplifierDB->pOutput2;
+	dInput = sPekiAmpDB->pInput2;
+	dOutput = sPekiAmpDB->pOutput2;
 	for (sampleIndex = 0; sampleIndex < SampleCount; ++sampleIndex)
 		dOutput[sampleIndex] = dInput[sampleIndex] * pow10f(dGain / 20.0);
 
 }
 
-static void cleanupAmplifierDB( LADSPA_Handle Instance ) { free(Instance); }
+static void cleanupPekiAmpDB( LADSPA_Handle Instance ) { free(Instance); }
 
-LADSPA_Descriptor* descmAmplifierDB = NULL;
-LADSPA_Descriptor* descsAmplifierDB = NULL;
+LADSPA_Descriptor* descmPekiAmpDB = NULL;
+LADSPA_Descriptor* descsPekiAmpDB = NULL;
 
 ON_LOAD_ROUTINE {
 
-	char ** pnAmplifierDB;
-	LADSPA_PortDescriptor* pdAmplifierDB;
-	LADSPA_PortRangeHint* prhAmplifierDB;
+	char ** pnPekiAmpDB;
+	LADSPA_PortDescriptor* pdPekiAmpDB;
+	LADSPA_PortRangeHint* prhPekiAmpDB;
 
-	descmAmplifierDB = (LADSPA_Descriptor*)malloc(sizeof(LADSPA_Descriptor));
-	descsAmplifierDB = (LADSPA_Descriptor*)malloc(sizeof(LADSPA_Descriptor));
+	descmPekiAmpDB = (LADSPA_Descriptor*)malloc(sizeof(LADSPA_Descriptor));
+	descsPekiAmpDB = (LADSPA_Descriptor*)malloc(sizeof(LADSPA_Descriptor));
 
-	if (descmAmplifierDB) {
+	if (descmPekiAmpDB) {
 
-		descmAmplifierDB->UniqueID = 2001;
+		descmPekiAmpDB->UniqueID = 2001;
 
-		descmAmplifierDB->Label = strdup("peki_ampdb_mono");
-		descmAmplifierDB->Name = strdup("Peki's Mono dB Amplifier");
-		descmAmplifierDB->Maker = strdup("Petar Katić (bratpeki)");
-		descmAmplifierDB->Copyright = strdup("GPLv3");
+		descmPekiAmpDB->Label = strdup("peki_ampdb_mono");
+		descmPekiAmpDB->Name = strdup("Peki's Mono dB Amplifier");
+		descmPekiAmpDB->Maker = strdup("Petar Katić (bratpeki)");
+		descmPekiAmpDB->Copyright = strdup("GPLv3");
 
-		descmAmplifierDB->PortCount = 3;
-		descmAmplifierDB->Properties = LADSPA_PROPERTY_HARD_RT_CAPABLE;
+		descmPekiAmpDB->PortCount = 3;
+		descmPekiAmpDB->Properties = LADSPA_PROPERTY_HARD_RT_CAPABLE;
 
-		pdAmplifierDB = (LADSPA_PortDescriptor*)calloc(3, sizeof(LADSPA_PortDescriptor));
-		pdAmplifierDB[AMP_CONTROL] = LADSPA_PORT_INPUT | LADSPA_PORT_CONTROL;
-		pdAmplifierDB[AMP_INPUT1] = LADSPA_PORT_INPUT | LADSPA_PORT_AUDIO;
-		pdAmplifierDB[AMP_OUTPUT1] = LADSPA_PORT_OUTPUT | LADSPA_PORT_AUDIO;
-		descmAmplifierDB->PortDescriptors = (const LADSPA_PortDescriptor*)pdAmplifierDB;
+		pdPekiAmpDB = (LADSPA_PortDescriptor*)calloc(3, sizeof(LADSPA_PortDescriptor));
+		pdPekiAmpDB[AMP_CONTROL] = LADSPA_PORT_INPUT | LADSPA_PORT_CONTROL;
+		pdPekiAmpDB[AMP_INPUT1] = LADSPA_PORT_INPUT | LADSPA_PORT_AUDIO;
+		pdPekiAmpDB[AMP_OUTPUT1] = LADSPA_PORT_OUTPUT | LADSPA_PORT_AUDIO;
+		descmPekiAmpDB->PortDescriptors = (const LADSPA_PortDescriptor*)pdPekiAmpDB;
 
-		pnAmplifierDB = (char **)calloc(3, sizeof(char*));
-		pnAmplifierDB[AMP_CONTROL] = strdup("Gain");
-		pnAmplifierDB[AMP_INPUT1] = strdup("Input");
-		pnAmplifierDB[AMP_OUTPUT1] = strdup("Output");
-		descmAmplifierDB->PortNames = (const char**)pnAmplifierDB;
+		pnPekiAmpDB = (char **)calloc(3, sizeof(char*));
+		pnPekiAmpDB[AMP_CONTROL] = strdup("Gain");
+		pnPekiAmpDB[AMP_INPUT1] = strdup("Input");
+		pnPekiAmpDB[AMP_OUTPUT1] = strdup("Output");
+		descmPekiAmpDB->PortNames = (const char**)pnPekiAmpDB;
 
-		prhAmplifierDB = ((LADSPA_PortRangeHint*)calloc(3, sizeof(LADSPA_PortRangeHint)));
-		prhAmplifierDB[AMP_CONTROL].HintDescriptor = (
+		prhPekiAmpDB = ((LADSPA_PortRangeHint*)calloc(3, sizeof(LADSPA_PortRangeHint)));
+		prhPekiAmpDB[AMP_CONTROL].HintDescriptor = (
 			LADSPA_HINT_BOUNDED_BELOW | LADSPA_HINT_BOUNDED_ABOVE | LADSPA_HINT_DEFAULT_0
 		);
-		prhAmplifierDB[AMP_CONTROL].LowerBound = -20;
-		prhAmplifierDB[AMP_CONTROL].UpperBound = 20;
-		prhAmplifierDB[AMP_INPUT1].HintDescriptor = 0;
-		prhAmplifierDB[AMP_OUTPUT1].HintDescriptor = 0;
-		descmAmplifierDB->PortRangeHints = (const LADSPA_PortRangeHint*)prhAmplifierDB;
+		prhPekiAmpDB[AMP_CONTROL].LowerBound = -20;
+		prhPekiAmpDB[AMP_CONTROL].UpperBound = 20;
+		prhPekiAmpDB[AMP_INPUT1].HintDescriptor = 0;
+		prhPekiAmpDB[AMP_OUTPUT1].HintDescriptor = 0;
+		descmPekiAmpDB->PortRangeHints = (const LADSPA_PortRangeHint*)prhPekiAmpDB;
 
-		descmAmplifierDB->instantiate = instantiateAmplifierDB;
-		descmAmplifierDB->connect_port = connectPortToAmplifierDB;
-		descmAmplifierDB->activate = NULL;
-		descmAmplifierDB->run = runMonoAmplifierDB;
-		descmAmplifierDB->run_adding = NULL;
-		descmAmplifierDB->set_run_adding_gain = NULL;
-		descmAmplifierDB->deactivate = NULL;
-		descmAmplifierDB->cleanup = cleanupAmplifierDB;
+		descmPekiAmpDB->instantiate = instantiatePekiAmpDB;
+		descmPekiAmpDB->connect_port = connectPortToPekiAmpDB;
+		descmPekiAmpDB->activate = NULL;
+		descmPekiAmpDB->run = runMonoPekiAmpDB;
+		descmPekiAmpDB->run_adding = NULL;
+		descmPekiAmpDB->set_run_adding_gain = NULL;
+		descmPekiAmpDB->deactivate = NULL;
+		descmPekiAmpDB->cleanup = cleanupPekiAmpDB;
 	}
 
-	if (descsAmplifierDB) {
+	if (descsPekiAmpDB) {
 
-		descsAmplifierDB->UniqueID = 2002;
+		descsPekiAmpDB->UniqueID = 2002;
 
-		descsAmplifierDB->Label = strdup("peki_ampdb_stereo");
-		descsAmplifierDB->Name = strdup("Peki's Stereo dB Amplifier");
-		descsAmplifierDB->Maker = strdup("Petar Katić (bratpeki)");
-		descsAmplifierDB->Copyright = strdup("GPLv3");
+		descsPekiAmpDB->Label = strdup("peki_ampdb_stereo");
+		descsPekiAmpDB->Name = strdup("Peki's Stereo dB Amplifier");
+		descsPekiAmpDB->Maker = strdup("Petar Katić (bratpeki)");
+		descsPekiAmpDB->Copyright = strdup("GPLv3");
 
-		descsAmplifierDB->PortCount = 5;
-		descsAmplifierDB->Properties = LADSPA_PROPERTY_HARD_RT_CAPABLE;
+		descsPekiAmpDB->PortCount = 5;
+		descsPekiAmpDB->Properties = LADSPA_PROPERTY_HARD_RT_CAPABLE;
 
-		pdAmplifierDB = (LADSPA_PortDescriptor*)calloc(5, sizeof(LADSPA_PortDescriptor));
-		pdAmplifierDB[AMP_CONTROL] = LADSPA_PORT_INPUT | LADSPA_PORT_CONTROL;
-		pdAmplifierDB[AMP_INPUT1] = LADSPA_PORT_INPUT | LADSPA_PORT_AUDIO;
-		pdAmplifierDB[AMP_OUTPUT1] = LADSPA_PORT_OUTPUT | LADSPA_PORT_AUDIO;
-		pdAmplifierDB[AMP_INPUT2] = LADSPA_PORT_INPUT | LADSPA_PORT_AUDIO;
-		pdAmplifierDB[AMP_OUTPUT2] = LADSPA_PORT_OUTPUT | LADSPA_PORT_AUDIO;
-		descsAmplifierDB->PortDescriptors = (const LADSPA_PortDescriptor*)pdAmplifierDB;
+		pdPekiAmpDB = (LADSPA_PortDescriptor*)calloc(5, sizeof(LADSPA_PortDescriptor));
+		pdPekiAmpDB[AMP_CONTROL] = LADSPA_PORT_INPUT | LADSPA_PORT_CONTROL;
+		pdPekiAmpDB[AMP_INPUT1] = LADSPA_PORT_INPUT | LADSPA_PORT_AUDIO;
+		pdPekiAmpDB[AMP_OUTPUT1] = LADSPA_PORT_OUTPUT | LADSPA_PORT_AUDIO;
+		pdPekiAmpDB[AMP_INPUT2] = LADSPA_PORT_INPUT | LADSPA_PORT_AUDIO;
+		pdPekiAmpDB[AMP_OUTPUT2] = LADSPA_PORT_OUTPUT | LADSPA_PORT_AUDIO;
+		descsPekiAmpDB->PortDescriptors = (const LADSPA_PortDescriptor*)pdPekiAmpDB;
 
-		pnAmplifierDB = (char **)calloc(5, sizeof(char*));
-		pnAmplifierDB[AMP_CONTROL] = strdup("Gain");
-		pnAmplifierDB[AMP_INPUT1] = strdup("Input (Left)");
-		pnAmplifierDB[AMP_OUTPUT1] = strdup("Output (Left)");
-		pnAmplifierDB[AMP_INPUT2] = strdup("Input (Right)");
-		pnAmplifierDB[AMP_OUTPUT2] = strdup("Output (Right)");
-		descsAmplifierDB->PortNames = (const char**)pnAmplifierDB;
+		pnPekiAmpDB = (char **)calloc(5, sizeof(char*));
+		pnPekiAmpDB[AMP_CONTROL] = strdup("Gain");
+		pnPekiAmpDB[AMP_INPUT1] = strdup("Input (Left)");
+		pnPekiAmpDB[AMP_OUTPUT1] = strdup("Output (Left)");
+		pnPekiAmpDB[AMP_INPUT2] = strdup("Input (Right)");
+		pnPekiAmpDB[AMP_OUTPUT2] = strdup("Output (Right)");
+		descsPekiAmpDB->PortNames = (const char**)pnPekiAmpDB;
 
-		prhAmplifierDB = ((LADSPA_PortRangeHint*)calloc(5, sizeof(LADSPA_PortRangeHint)));
-		prhAmplifierDB[AMP_CONTROL].HintDescriptor = (
+		prhPekiAmpDB = ((LADSPA_PortRangeHint*)calloc(5, sizeof(LADSPA_PortRangeHint)));
+		prhPekiAmpDB[AMP_CONTROL].HintDescriptor = (
 			LADSPA_HINT_BOUNDED_BELOW | LADSPA_HINT_BOUNDED_ABOVE | LADSPA_HINT_DEFAULT_0
 		);
-		prhAmplifierDB[AMP_CONTROL].LowerBound = -20;
-		prhAmplifierDB[AMP_CONTROL].UpperBound = 20;
-		prhAmplifierDB[AMP_INPUT1].HintDescriptor = 0;
-		prhAmplifierDB[AMP_OUTPUT1].HintDescriptor = 0;
-		prhAmplifierDB[AMP_INPUT2].HintDescriptor = 0;
-		prhAmplifierDB[AMP_OUTPUT2].HintDescriptor = 0;
-		descsAmplifierDB->PortRangeHints = (const LADSPA_PortRangeHint*)prhAmplifierDB;
+		prhPekiAmpDB[AMP_CONTROL].LowerBound = -20;
+		prhPekiAmpDB[AMP_CONTROL].UpperBound = 20;
+		prhPekiAmpDB[AMP_INPUT1].HintDescriptor = 0;
+		prhPekiAmpDB[AMP_OUTPUT1].HintDescriptor = 0;
+		prhPekiAmpDB[AMP_INPUT2].HintDescriptor = 0;
+		prhPekiAmpDB[AMP_OUTPUT2].HintDescriptor = 0;
+		descsPekiAmpDB->PortRangeHints = (const LADSPA_PortRangeHint*)prhPekiAmpDB;
 
-		descsAmplifierDB->instantiate = instantiateAmplifierDB;
-		descsAmplifierDB->connect_port = connectPortToAmplifierDB;
-		descsAmplifierDB->activate = NULL;
-		descsAmplifierDB->run = runStereoAmplifierDB;
-		descsAmplifierDB->run_adding = NULL;
-		descsAmplifierDB->set_run_adding_gain = NULL;
-		descsAmplifierDB->deactivate = NULL;
-		descsAmplifierDB->cleanup = cleanupAmplifierDB;
+		descsPekiAmpDB->instantiate = instantiatePekiAmpDB;
+		descsPekiAmpDB->connect_port = connectPortToPekiAmpDB;
+		descsPekiAmpDB->activate = NULL;
+		descsPekiAmpDB->run = runStereoPekiAmpDB;
+		descsPekiAmpDB->run_adding = NULL;
+		descsPekiAmpDB->set_run_adding_gain = NULL;
+		descsPekiAmpDB->deactivate = NULL;
+		descsPekiAmpDB->cleanup = cleanupPekiAmpDB;
 
 	}
 
 }
 
-static void deleteDescriptor(LADSPA_Descriptor* descAmplifierDB) {
+static void deleteDescriptor(LADSPA_Descriptor* descPekiAmpDB) {
 
 	unsigned long lIndex;
 
-	if (descAmplifierDB) {
-		free((char*)descAmplifierDB->Label);
-		free((char*)descAmplifierDB->Name);
-		free((char*)descAmplifierDB->Maker);
-		free((char*)descAmplifierDB->Copyright);
-		free((LADSPA_PortDescriptor*)descAmplifierDB->PortDescriptors);
-		for (lIndex = 0; lIndex < descAmplifierDB->PortCount; lIndex++)
-			free((char*)(descAmplifierDB->PortNames[lIndex]));
-		free((char**)descAmplifierDB->PortNames);
-		free((LADSPA_PortRangeHint*)descAmplifierDB->PortRangeHints);
-		free(descAmplifierDB);
+	if (descPekiAmpDB) {
+		free((char*)descPekiAmpDB->Label);
+		free((char*)descPekiAmpDB->Name);
+		free((char*)descPekiAmpDB->Maker);
+		free((char*)descPekiAmpDB->Copyright);
+		free((LADSPA_PortDescriptor*)descPekiAmpDB->PortDescriptors);
+		for (lIndex = 0; lIndex < descPekiAmpDB->PortCount; lIndex++)
+			free((char*)(descPekiAmpDB->PortNames[lIndex]));
+		free((char**)descPekiAmpDB->PortNames);
+		free((LADSPA_PortRangeHint*)descPekiAmpDB->PortRangeHints);
+		free(descPekiAmpDB);
 	}
 
 }
 
 ON_UNLOAD_ROUTINE {
-	deleteDescriptor(descmAmplifierDB);
-	deleteDescriptor(descsAmplifierDB);
+	deleteDescriptor(descmPekiAmpDB);
+	deleteDescriptor(descsPekiAmpDB);
 }
 
 const LADSPA_Descriptor* ladspa_descriptor(unsigned long Index) {
 
 	switch (Index) {
-		case 0: return descmAmplifierDB;
-		case 1: return descsAmplifierDB;
+		case 0: return descmPekiAmpDB;
+		case 1: return descsPekiAmpDB;
 		default: return NULL;
 	}
 
