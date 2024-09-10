@@ -11,6 +11,7 @@
  *   Descriptors      | desc... | descm for moro, descs for stereo
  *   Port descriptors | pd...   |
  *   Port range hints | prh...  |
+ *   Port names       | pn...   |
  */
 
 #include <stdlib.h>
@@ -130,7 +131,7 @@ LADSPA_Descriptor* descsAmplifier = NULL;
 
 ON_LOAD_ROUTINE {
 
-	char ** pcPortNames;
+	char ** pnAmplifier;
 	LADSPA_PortDescriptor* pdAmplifier;
 	LADSPA_PortRangeHint* prhAmplifier;
 
@@ -155,11 +156,11 @@ ON_LOAD_ROUTINE {
 		pdAmplifier[AMP_OUTPUT1] = LADSPA_PORT_OUTPUT | LADSPA_PORT_AUDIO;
 		descmAmplifier->PortDescriptors = (const LADSPA_PortDescriptor*)pdAmplifier;
 
-		pcPortNames = (char **)calloc(3, sizeof(char*));
-		pcPortNames[AMP_CONTROL] = strdup("Gain");
-		pcPortNames[AMP_INPUT1] = strdup("Input");
-		pcPortNames[AMP_OUTPUT1] = strdup("Output");
-		descmAmplifier->PortNames = (const char **)pcPortNames;
+		pnAmplifier = (char **)calloc(3, sizeof(char*));
+		pnAmplifier[AMP_CONTROL] = strdup("Gain");
+		pnAmplifier[AMP_INPUT1] = strdup("Input");
+		pnAmplifier[AMP_OUTPUT1] = strdup("Output");
+		descmAmplifier->PortNames = (const char **)pnAmplifier;
 
 		prhAmplifier = ((LADSPA_PortRangeHint*)calloc(3, sizeof(LADSPA_PortRangeHint)));
 		prhAmplifier[AMP_CONTROL].HintDescriptor = (
@@ -200,13 +201,13 @@ ON_LOAD_ROUTINE {
 		pdAmplifier[AMP_OUTPUT2] = LADSPA_PORT_OUTPUT | LADSPA_PORT_AUDIO;
 		descsAmplifier->PortDescriptors = (const LADSPA_PortDescriptor*)pdAmplifier;
 
-		pcPortNames = (char **)calloc(5, sizeof(char*));
-		pcPortNames[AMP_CONTROL] = strdup("Gain");
-		pcPortNames[AMP_INPUT1] = strdup("Input (Left)");
-		pcPortNames[AMP_OUTPUT1] = strdup("Output (Left)");
-		pcPortNames[AMP_INPUT2] = strdup("Input (Right)");
-		pcPortNames[AMP_OUTPUT2] = strdup("Output (Right)");
-		descsAmplifier->PortNames = (const char **)pcPortNames;
+		pnAmplifier = (char **)calloc(5, sizeof(char*));
+		pnAmplifier[AMP_CONTROL] = strdup("Gain");
+		pnAmplifier[AMP_INPUT1] = strdup("Input (Left)");
+		pnAmplifier[AMP_OUTPUT1] = strdup("Output (Left)");
+		pnAmplifier[AMP_INPUT2] = strdup("Input (Right)");
+		pnAmplifier[AMP_OUTPUT2] = strdup("Output (Right)");
+		descsAmplifier->PortNames = (const char **)pnAmplifier;
 
 		prhAmplifier = ((LADSPA_PortRangeHint*)calloc(5, sizeof(LADSPA_PortRangeHint)));
 		prhAmplifier[AMP_CONTROL].HintDescriptor = (
@@ -232,21 +233,21 @@ ON_LOAD_ROUTINE {
 
 }
 
-static void deleteDescriptor(LADSPA_Descriptor* psDescriptor) {
+static void deleteDescriptor(LADSPA_Descriptor* descAmplifier) {
 
 	unsigned long lIndex;
 
-	if (psDescriptor) {
-		free((char*)psDescriptor->Label);
-		free((char*)psDescriptor->Name);
-		free((char*)psDescriptor->Maker);
-		free((char*)psDescriptor->Copyright);
-		free((LADSPA_PortDescriptor*)psDescriptor->PortDescriptors);
-		for (lIndex = 0; lIndex < psDescriptor->PortCount; lIndex++)
-			free((char*)(psDescriptor->PortNames[lIndex]));
-		free((char**)psDescriptor->PortNames);
-		free((LADSPA_PortRangeHint*)psDescriptor->PortRangeHints);
-		free(psDescriptor);
+	if (descAmplifier) {
+		free((char*)descAmplifier->Label);
+		free((char*)descAmplifier->Name);
+		free((char*)descAmplifier->Maker);
+		free((char*)descAmplifier->Copyright);
+		free((LADSPA_PortDescriptor*)descAmplifier->PortDescriptors);
+		for (lIndex = 0; lIndex < descAmplifier->PortCount; lIndex++)
+			free((char*)(descAmplifier->PortNames[lIndex]));
+		free((char**)descAmplifier->PortNames);
+		free((LADSPA_PortRangeHint*)descAmplifier->PortRangeHints);
+		free(descAmplifier);
 	}
 
 }
