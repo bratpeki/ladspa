@@ -131,7 +131,7 @@ ON_LOAD_ROUTINE {
 		descmPekiAmpDB->UniqueID = 2001;
 
 		descmPekiAmpDB->Label = strdup("peki_ampdb_mono");
-		descmPekiAmpDB->Name = strdup("Peki's Mono dB Amplifier");
+		descmPekiAmpDB->Name = strdup("Peki's dB Amplifier (Mono)");
 		descmPekiAmpDB->Maker = strdup("Petar Katić (bratpeki)");
 		descmPekiAmpDB->Copyright = strdup("GPLv3");
 
@@ -175,7 +175,7 @@ ON_LOAD_ROUTINE {
 		descsPekiAmpDB->UniqueID = 2002;
 
 		descsPekiAmpDB->Label = strdup("peki_ampdb_stereo");
-		descsPekiAmpDB->Name = strdup("Peki's Stereo dB Amplifier");
+		descsPekiAmpDB->Name = strdup("Peki's dB Amplifier (Stereo)");
 		descsPekiAmpDB->Maker = strdup("Petar Katić (bratpeki)");
 		descsPekiAmpDB->Copyright = strdup("GPLv3");
 
