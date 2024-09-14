@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -fPIC
+CFLAGS = -fPIC -Wall -Werror -Wpedantic
 LDFLAGS = -shared -lm -ldl
 
 SOURCES = $(wildcard *.c)
